@@ -1,0 +1,2402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkOS Code Atlas - Intelligent Code Analysis & Visualization</title>
+    <meta name="description" content="Transform your codebase with AI-powered static analysis, dependency mapping, and intelligent visualizations. Built for engineering teams at scale.">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="WorkOS Code Atlas - Intelligent Code Analysis & Visualization">
+    <meta property="og:description" content="Transform your codebase with AI-powered static analysis, dependency mapping, and intelligent visualizations.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://workos.com">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺️</text></svg>">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- D3.js for interactive demos -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Colors */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+            
+            /* Neutral Colors */
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            --font-size-4xl: 2.25rem;
+            --font-size-5xl: 3rem;
+            --font-size-6xl: 3.75rem;
+            
+            /* Spacing */
+            --spacing-1: 0.25rem;
+            --spacing-2: 0.5rem;
+            --spacing-3: 0.75rem;
+            --spacing-4: 1rem;
+            --spacing-5: 1.25rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+            --spacing-10: 2.5rem;
+            --spacing-12: 3rem;
+            --spacing-16: 4rem;
+            --spacing-20: 5rem;
+            --spacing-24: 6rem;
+            --spacing-32: 8rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            /* Border Radius */
+            --radius-sm: 0.25rem;
+            --radius: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --radius-full: 9999px;
+        }
+
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            color: var(--gray-800);
+            background-color: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: var(--spacing-4);
+        }
+
+        h1 { font-size: var(--font-size-5xl); }
+        h2 { font-size: var(--font-size-4xl); }
+        h3 { font-size: var(--font-size-3xl); }
+        h4 { font-size: var(--font-size-2xl); }
+        h5 { font-size: var(--font-size-xl); }
+        h6 { font-size: var(--font-size-lg); }
+
+        p {
+            margin-bottom: var(--spacing-4);
+            color: var(--gray-600);
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-6);
+        }
+
+        .container-wide {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-6);
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--gray-200);
+            z-index: 1000;
+            padding: var(--spacing-4) 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--gray-900);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            font-size: var(--font-size-2xl);
+        }
+
+        .nav {
+            display: flex;
+            gap: var(--spacing-8);
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .cta-button {
+            background: var(--primary);
+            color: var(--white);
+            padding: var(--spacing-3) var(--spacing-6);
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: var(--spacing-32) 0 var(--spacing-24);
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: var(--font-size-6xl);
+            margin-bottom: var(--spacing-6);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: var(--font-size-xl);
+            color: var(--gray-600);
+            margin-bottom: var(--spacing-8);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: var(--spacing-4);
+            justify-content: center;
+            margin-bottom: var(--spacing-16);
+        }
+
+        .secondary-button {
+            background: var(--white);
+            color: var(--gray-700);
+            padding: var(--spacing-3) var(--spacing-6);
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            font-weight: 600;
+            border: 2px solid var(--gray-200);
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .secondary-button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Demo Section */
+        .demo-section {
+            padding: var(--spacing-24) 0;
+            background: var(--white);
+        }
+
+        .demo-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-16);
+            align-items: center;
+        }
+
+        .demo-content h2 {
+            margin-bottom: var(--spacing-6);
+        }
+
+        .demo-features {
+            list-style: none;
+            margin-bottom: var(--spacing-8);
+        }
+
+        .demo-features li {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            margin-bottom: var(--spacing-4);
+            color: var(--gray-700);
+        }
+
+        .demo-features li::before {
+            content: "✓";
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .demo-visualization {
+            background: var(--gray-50);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-6);
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Token Efficiency Section */
+        .token-efficiency-section {
+            padding: var(--spacing-24) 0;
+            background: linear-gradient(135deg, #fef3c7 0%, #fef7cd 100%);
+        }
+
+        .efficiency-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-16);
+            align-items: center;
+        }
+
+        .efficiency-content {
+            padding-right: var(--spacing-8);
+        }
+
+        .problem-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-6);
+            margin: var(--spacing-8) 0;
+        }
+
+        .problem-stats .stat-item {
+            text-align: center;
+            padding: var(--spacing-4);
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .problem-stats .stat-number {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            color: var(--red-600);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .problem-stats .stat-label {
+            font-size: var(--font-size-sm);
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .solution-highlight {
+            background: var(--green-50);
+            border: 2px solid var(--green-200);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+            margin-top: var(--spacing-8);
+        }
+
+        .solution-highlight h4 {
+            color: var(--green-700);
+            margin-bottom: var(--spacing-3);
+        }
+
+        .solution-highlight p {
+            color: var(--green-600);
+            margin-bottom: 0;
+        }
+
+        .comparison-demo {
+            display: flex;
+            gap: var(--spacing-6);
+            align-items: stretch;
+            margin-bottom: var(--spacing-8);
+        }
+
+        .demo-column {
+            flex: 1;
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-6);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-column::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--red-500), var(--red-600));
+        }
+
+        .demo-column:last-child::before {
+            background: linear-gradient(90deg, var(--green-500), var(--green-600));
+        }
+
+        .demo-column:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+        }
+
+        .demo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-4);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-6);
+            font-weight: 600;
+            position: relative;
+        }
+
+        .demo-header.bad {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            color: var(--red-800);
+            border: 1px solid var(--red-200);
+        }
+
+        .demo-header.good {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            color: var(--green-800);
+            border: 1px solid var(--green-200);
+        }
+
+        .demo-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+        }
+
+        .token-count {
+            font-size: var(--font-size-xl);
+            font-weight: 800;
+            padding: var(--spacing-2) var(--spacing-4);
+            border-radius: var(--radius-full);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .demo-header.bad .token-count {
+            color: var(--red-700);
+            border: 1px solid var(--red-300);
+        }
+
+        .demo-header.good .token-count {
+            color: var(--green-700);
+            border: 1px solid var(--green-300);
+        }
+
+        .context-blocks {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-3);
+            margin-bottom: var(--spacing-6);
+            min-height: 280px;
+        }
+
+        .context-block {
+            padding: var(--spacing-3) var(--spacing-4);
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            position: relative;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .context-block::before {
+            content: '';
+            position: absolute;
+            left: var(--spacing-3);
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .context-block.irrelevant {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            color: var(--red-800);
+            border-color: var(--red-200);
+            opacity: 0.8;
+            padding-left: var(--spacing-8);
+        }
+
+        .context-block.irrelevant::before {
+            background: var(--red-500);
+        }
+
+        .context-block.relevant {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            color: var(--green-800);
+            border-color: var(--green-200);
+            padding-left: var(--spacing-8);
+            box-shadow: 0 2px 4px rgba(34, 197, 94, 0.1);
+        }
+
+        .context-block.relevant::before {
+            background: var(--green-500);
+        }
+
+        .context-block:hover {
+            transform: translateX(2px);
+        }
+
+        .result-indicator {
+            text-align: center;
+            padding: var(--spacing-4);
+            border-radius: var(--radius-lg);
+            font-weight: 700;
+            font-size: var(--font-size-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-indicator::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .result-indicator:hover::before {
+            left: 100%;
+        }
+
+        .result-indicator.bad {
+            background: linear-gradient(135deg, var(--red-500) 0%, var(--red-600) 100%);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .result-indicator.good {
+            background: linear-gradient(135deg, var(--green-500) 0%, var(--green-600) 100%);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .vs-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-2xl);
+            font-weight: 800;
+            color: var(--gray-400);
+            min-width: 80px;
+            position: relative;
+        }
+
+        .vs-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+            border-radius: 50%;
+            z-index: -1;
+            border: 2px solid var(--white);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .smart-context-flow {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+            box-shadow: var(--shadow-md);
+        }
+
+        .flow-title {
+            text-align: center;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: var(--spacing-6);
+        }
+
+        .context-steps {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .context-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-2);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .step-text {
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--gray-600);
+            text-align: center;
+        }
+
+        .context-steps .flow-arrow {
+            color: var(--gray-400);
+            font-size: var(--font-size-xl);
+            margin: 0 var(--spacing-2);
+        }
+
+        /* Interactive Demo */
+        .interactive-demo {
+            background: var(--gray-900);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-6);
+            color: var(--white);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: var(--font-size-sm);
+            line-height: 1.5;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .demo-line {
+            margin-bottom: var(--spacing-1);
+            opacity: 0;
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .demo-line:nth-child(1) { animation-delay: 0.1s; }
+        .demo-line:nth-child(2) { animation-delay: 0.2s; }
+        .demo-line:nth-child(3) { animation-delay: 0.3s; }
+        .demo-line:nth-child(4) { animation-delay: 0.4s; }
+        .demo-line:nth-child(5) { animation-delay: 0.5s; }
+        .demo-line:nth-child(6) { animation-delay: 0.6s; }
+        .demo-line:nth-child(7) { animation-delay: 0.7s; }
+        .demo-line:nth-child(8) { animation-delay: 0.8s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: var(--spacing-24) 0;
+            background: var(--gray-50);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-8);
+            margin-top: var(--spacing-16);
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: var(--spacing-8);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .feature-icon {
+            font-size: var(--font-size-4xl);
+            margin-bottom: var(--spacing-4);
+        }
+
+        .feature-card h3 {
+            margin-bottom: var(--spacing-4);
+            color: var(--gray-900);
+        }
+
+        /* Visualization Demo */
+        .visualization-demo {
+            padding: var(--spacing-24) 0;
+            background: var(--white);
+        }
+
+        .demo-tabs {
+            display: flex;
+            gap: var(--spacing-2);
+            margin-bottom: var(--spacing-8);
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .demo-tab {
+            padding: var(--spacing-3) var(--spacing-6);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray-600);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .demo-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .demo-content {
+            background: var(--gray-50);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-8);
+            min-height: 400px;
+            position: relative;
+        }
+
+        /* D3 Visualization Styles */
+        .d3-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node {
+            cursor: pointer;
+        }
+
+        .node:hover {
+            stroke: var(--primary);
+            stroke-width: 2px;
+        }
+
+        .link {
+            stroke: var(--gray-300);
+            stroke-opacity: 0.6;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: var(--gray-900);
+            color: var(--white);
+            padding: var(--spacing-2) var(--spacing-3);
+            border-radius: var(--radius);
+            font-size: var(--font-size-sm);
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: var(--spacing-24) 0;
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-8);
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: var(--font-size-4xl);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .stat-item p {
+            color: var(--gray-200);
+            font-size: var(--font-size-lg);
+        }
+
+        /* Section Badge */
+        .section-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            padding: var(--spacing-2) var(--spacing-4);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            margin-bottom: var(--spacing-4);
+        }
+
+        .section-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--gray-600);
+            margin-bottom: var(--spacing-8);
+            line-height: 1.7;
+        }
+
+        /* Coding Agent Section */
+        .coding-agent-section {
+            padding: var(--spacing-24) 0;
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+        }
+
+        .agent-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-16);
+            align-items: center;
+        }
+
+        .agent-features {
+            margin-bottom: var(--spacing-8);
+        }
+
+        .agent-feature {
+            display: flex;
+            gap: var(--spacing-4);
+            margin-bottom: var(--spacing-6);
+            padding: var(--spacing-4);
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .agent-feature .feature-icon {
+            font-size: var(--font-size-2xl);
+            flex-shrink: 0;
+        }
+
+        .agent-feature h4 {
+            margin-bottom: var(--spacing-2);
+            color: var(--gray-900);
+        }
+
+        .agent-feature p {
+            margin-bottom: 0;
+            font-size: var(--font-size-sm);
+        }
+
+        .agent-demo {
+            background: var(--gray-900);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+
+        .demo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-4) var(--spacing-6);
+            background: var(--gray-800);
+            color: var(--white);
+        }
+
+        .demo-title {
+            font-weight: 600;
+        }
+
+        .demo-status {
+            color: var(--success);
+            font-size: var(--font-size-sm);
+        }
+
+        .agent-chat {
+            padding: var(--spacing-6);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .chat-message {
+            margin-bottom: var(--spacing-4);
+            display: flex;
+        }
+
+        .chat-message.user {
+            justify-content: flex-end;
+        }
+
+        .chat-message.agent {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: var(--spacing-3) var(--spacing-4);
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-sm);
+            line-height: 1.5;
+        }
+
+        .chat-message.user .message-content {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .chat-message.agent .message-content {
+            background: var(--gray-700);
+            color: var(--white);
+        }
+
+        .knowledge-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-4);
+            padding: var(--spacing-8);
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .flow-step {
+            text-align: center;
+            padding: var(--spacing-4);
+        }
+
+        .step-icon {
+            font-size: var(--font-size-3xl);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .step-text {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .flow-arrow {
+            font-size: var(--font-size-xl);
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Knowledge Partnership Section */
+        .knowledge-partnership-section {
+            padding: var(--spacing-24) 0;
+            background: var(--white);
+        }
+
+        .partnership-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-16);
+            align-items: center;
+        }
+
+        .partnership-benefits {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-6);
+            margin-top: var(--spacing-8);
+        }
+
+        .benefit-card {
+            background: var(--gray-50);
+            padding: var(--spacing-6);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .benefit-icon {
+            font-size: var(--font-size-3xl);
+            margin-bottom: var(--spacing-3);
+        }
+
+        .benefit-card h4 {
+            margin-bottom: var(--spacing-2);
+            color: var(--gray-900);
+        }
+
+        .benefit-card p {
+            font-size: var(--font-size-sm);
+            margin-bottom: 0;
+        }
+
+        .code-knowledge-sync {
+            background: var(--gray-50);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-8);
+        }
+
+        .sync-container {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-6);
+            margin-bottom: var(--spacing-8);
+        }
+
+        .code-side, .knowledge-side {
+            flex: 1;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-6);
+            box-shadow: var(--shadow);
+        }
+
+        .code-header, .knowledge-header {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--spacing-4);
+            text-align: center;
+        }
+
+        .code-files, .knowledge-nodes {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-2);
+        }
+
+        .file-item, .node-item {
+            padding: var(--spacing-2) var(--spacing-3);
+            background: var(--gray-100);
+            border-radius: var(--radius);
+            font-size: var(--font-size-sm);
+            color: var(--gray-700);
+        }
+
+        .sync-arrows {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-4);
+        }
+
+        .sync-arrow {
+            font-size: var(--font-size-xl);
+            color: var(--primary);
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .ai-models {
+            text-align: center;
+        }
+
+        .models-label {
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: var(--spacing-4);
+        }
+
+        .model-badges {
+            display: flex;
+            gap: var(--spacing-3);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .model-badge {
+            background: var(--primary);
+            color: var(--white);
+            padding: var(--spacing-2) var(--spacing-4);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+
+        .model-icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.5em;
+            width: 1.2em;
+            height: 1.2em;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: var(--spacing-24) 0;
+            background: var(--gray-900);
+            color: var(--white);
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            margin-bottom: var(--spacing-6);
+        }
+
+        .cta-section p {
+            color: var(--gray-300);
+            margin-bottom: var(--spacing-8);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--gray-900);
+            color: var(--gray-400);
+            padding: var(--spacing-16) 0;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 var(--spacing-4);
+            }
+
+            .hero h1 {
+                font-size: var(--font-size-4xl);
+            }
+
+            .hero-subtitle {
+                font-size: var(--font-size-lg);
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .demo-container {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-8);
+            }
+
+            .agent-container {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-8);
+            }
+
+            .partnership-container {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-8);
+            }
+
+            .partnership-benefits {
+                grid-template-columns: 1fr;
+            }
+
+            .knowledge-flow {
+                flex-direction: column;
+                gap: var(--spacing-6);
+            }
+
+            .sync-container {
+                flex-direction: column;
+                gap: var(--spacing-4);
+            }
+
+            .sync-arrows {
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav {
+                display: none;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: slideInLeft 0.6s ease forwards;
+        }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(30px);
+            animation: slideInRight 0.6s ease forwards;
+        }
+
+        @keyframes slideInRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        #hero-demo {
+            width: 100%;
+            min-width: 320px;
+            min-height: 300px;
+            height: 300px;
+            max-width: 100%;
+            display: block;
+        }
+        #hero-demo svg {
+            width: 100% !important;
+            height: 300px !important;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Brain outline with circuit patterns -->
+                            <path d="M50 10C35 10 25 20 25 35C25 40 26 44 28 48C26 52 25 56 25 60C25 75 35 85 50 85C65 85 75 75 75 60C75 56 74 52 72 48C74 44 75 40 75 35C75 20 65 10 50 10Z" fill="none" stroke="url(#brainGradient)" stroke-width="2"/>
+                            
+                            <!-- Left hemisphere circuits (blue) -->
+                            <g stroke="#6366f1" stroke-width="1.5" fill="none">
+                                <circle cx="35" cy="25" r="2" fill="#6366f1"/>
+                                <circle cx="40" cy="30" r="1.5" fill="#6366f1"/>
+                                <circle cx="30" cy="35" r="1.5" fill="#6366f1"/>
+                                <circle cx="45" cy="40" r="2" fill="#6366f1"/>
+                                <circle cx="35" cy="45" r="1.5" fill="#6366f1"/>
+                                <circle cx="40" cy="55" r="1.5" fill="#6366f1"/>
+                                <circle cx="30" cy="60" r="2" fill="#6366f1"/>
+                                
+                                <path d="M35 25 L40 30 L45 40 L35 45 L40 55 L30 60"/>
+                                <path d="M30 35 L35 25 L40 30"/>
+                                <path d="M45 40 L40 55"/>
+                                <path d="M35 45 L30 60"/>
+                            </g>
+                            
+                            <!-- Right hemisphere circuits (green) -->
+                            <g stroke="#10b981" stroke-width="1.5" fill="none">
+                                <circle cx="65" cy="25" r="2" fill="#10b981"/>
+                                <circle cx="60" cy="30" r="1.5" fill="#10b981"/>
+                                <circle cx="70" cy="35" r="1.5" fill="#10b981"/>
+                                <circle cx="55" cy="40" r="2" fill="#10b981"/>
+                                <circle cx="65" cy="45" r="1.5" fill="#10b981"/>
+                                <circle cx="60" cy="55" r="1.5" fill="#10b981"/>
+                                <circle cx="70" cy="60" r="2" fill="#10b981"/>
+                                
+                                <path d="M65 25 L60 30 L55 40 L65 45 L60 55 L70 60"/>
+                                <path d="M70 35 L65 25 L60 30"/>
+                                <path d="M55 40 L60 55"/>
+                                <path d="M65 45 L70 60"/>
+                            </g>
+                            
+                            <!-- Central connection -->
+                            <line x1="45" y1="40" x2="55" y2="40" stroke="url(#brainGradient)" stroke-width="2"/>
+                            <circle cx="50" cy="40" r="2" fill="url(#brainGradient)"/>
+                            
+                            <!-- Gradient definition -->
+                            <defs>
+                                <linearGradient id="brainGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <span>WorkOS Code Atlas</span>
+                </a>
+                <nav class="nav">
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#demo" class="nav-link">Demo</a>
+                    <a href="#pricing" class="nav-link">Pricing</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                    <a href="#" class="cta-button">Get Started</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="fade-in">Tame Your Software's Overwhelming Complexity</h1>
+            <p class="hero-subtitle fade-in">
+                Modern software systems are impossibly complex. WorkOS Code Atlas cuts through the chaos, 
+                automatically mapping your entire codebase into an intelligent knowledge graph that reveals 
+                hidden patterns, dependencies, and risks.
+            </p>
+            <div class="hero-buttons fade-in">
+                <a href="#demo" class="cta-button">Escape the Chaos</a>
+                <a href="#features" class="secondary-button">See the Solution</a>
+            </div>
+            
+            <!-- Live Demo Preview -->
+            <div class="demo-visualization fade-in">
+                <div id="hero-demo"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Intelligent Coding Agent Section -->
+    <section class="coding-agent-section">
+        <div class="container">
+            <div class="agent-container">
+                <div class="agent-content slide-in-left">
+                    <div class="section-badge">🤖 AI-Powered</div>
+                    <h2>The Intelligent Coding Agent</h2>
+                    <p class="section-subtitle">
+                        Meet your new coding partner that understands your codebase like never before. 
+                        Powered by our knowledge graph, it provides context-aware assistance for every coding task.
+                    </p>
+                    
+                    <div class="agent-features">
+                        <div class="agent-feature">
+                            <div class="feature-icon">🧠</div>
+                            <div class="feature-content">
+                                <h4>Context-Aware Intelligence</h4>
+                                <p>Understands your entire codebase architecture, dependencies, and patterns to provide accurate suggestions.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="agent-feature">
+                            <div class="feature-icon">🎯</div>
+                            <div class="feature-content">
+                                <h4>Precise Code Generation</h4>
+                                <p>Generates code that fits seamlessly with your existing patterns, naming conventions, and architectural decisions.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="agent-feature">
+                            <div class="feature-icon">🔍</div>
+                            <div class="feature-content">
+                                <h4>Smart Refactoring</h4>
+                                <p>Suggests improvements based on your codebase's complexity analysis and technical debt insights.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="agent-demo">
+                        <div class="demo-header">
+                            <span class="demo-title">Live Agent Interaction</span>
+                            <span class="demo-status">● Active</span>
+                        </div>
+                        <div class="agent-chat" id="agent-chat">
+                            <div class="chat-message user">
+                                <div class="message-content">
+                                    "Add a new user authentication endpoint following our existing patterns"
+                                </div>
+                            </div>
+                            <div class="chat-message agent">
+                                <div class="message-content">
+                                    "I'll create an auth endpoint using your Express.js patterns. Based on your codebase, I see you use JWT tokens and have a User model. Here's the implementation..."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="agent-visualization slide-in-right">
+                    <div class="knowledge-flow">
+                        <div class="flow-step">
+                            <div class="step-icon">📝</div>
+                            <div class="step-text">User Request</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-icon">🗺️</div>
+                            <div class="step-text">Knowledge Graph</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-icon">🤖</div>
+                            <div class="step-text">AI Agent</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-icon">✨</div>
+                            <div class="step-text">Perfect Code</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Knowledge Graph Partnership Section -->
+    <section class="knowledge-partnership-section">
+        <div class="container">
+            <div class="partnership-container">
+                <div class="partnership-content slide-in-left">
+                    <div class="section-badge">💎 Core Innovation</div>
+                    <h2>Your Code + Knowledge Graph = Perfect Partnership</h2>
+                    <p class="section-subtitle">
+                        The revolutionary approach where your knowledge stays with your code. 
+                        Every repository becomes a self-contained, AI-ready codebase that any coding model can instantly understand.
+                    </p>
+                    
+                    <div class="partnership-benefits">
+                        <div class="benefit-card">
+                            <div class="benefit-icon">🚀</div>
+                            <h4>Instant Onboarding</h4>
+                            <p>New team members or AI models can understand your codebase in minutes, not days.</p>
+                        </div>
+                        
+                        <div class="benefit-card">
+                            <div class="benefit-icon">🔒</div>
+                            <h4>Knowledge Preservation</h4>
+                            <p>Your architectural decisions, patterns, and context are preserved forever with your code.</p>
+                        </div>
+                        
+                        <div class="benefit-card">
+                            <div class="benefit-icon">🔄</div>
+                            <h4>Model Agnostic</h4>
+                            <p>Switch between any AI coding model without losing context or starting from scratch.</p>
+                        </div>
+                        
+                        <div class="benefit-card">
+                            <div class="benefit-icon">📈</div>
+                            <h4>Continuous Learning</h4>
+                            <p>Your knowledge graph evolves with every commit, becoming smarter over time.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="partnership-visualization slide-in-right">
+                    <div class="code-knowledge-sync">
+                        <div class="sync-container">
+                            <div class="code-side">
+                                <div class="code-header">Your Code Repository</div>
+                                <div class="code-files">
+                                    <div class="file-item">📄 app.js</div>
+                                    <div class="file-item">📄 userService.js</div>
+                                    <div class="file-item">📄 database.js</div>
+                                    <div class="file-item">📄 auth.js</div>
+                                </div>
+                            </div>
+                            
+                            <div class="sync-arrows">
+                                <div class="sync-arrow">⇄</div>
+                                <div class="sync-arrow">⇄</div>
+                                <div class="sync-arrow">⇄</div>
+                                <div class="sync-arrow">⇄</div>
+                            </div>
+                            
+                            <div class="knowledge-side">
+                                <div class="knowledge-header">Knowledge Graph</div>
+                                <div class="knowledge-nodes">
+                                    <div class="node-item">🏗️ Architecture</div>
+                                    <div class="node-item">🔗 Dependencies</div>
+                                    <div class="node-item">📊 Patterns</div>
+                                    <div class="node-item">🎯 Context</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-models">
+                            <div class="models-label">Any AI Model Can Instantly Understand</div>
+                            <div class="model-badges">
+                                <span class="model-badge"><span class="model-icon" title="GPT-4"> 
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-label="GPT-4" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" fill="#10a37f"/>
+                                        <path d="M10 6c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" fill="#10a37f"/>
+                                    </svg>
+                                </span>GPT-4</span>
+                                <span class="model-badge"><span class="model-icon" title="Claude">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-label="Claude" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="10" cy="10" r="9" fill="#fbbf24" stroke="#d97706" stroke-width="1"/>
+                                        <path d="M7 8h6v1H7zm0 2h6v1H7zm0 2h4v1H7z" fill="#92400e"/>
+                                    </svg>
+                                </span>Claude</span>
+                                <span class="model-badge"><span class="model-icon" title="Copilot">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-label="Copilot" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M10 2L12.5 7.5L18 8L14 12L15 17.5L10 15L5 17.5L6 12L2 8L7.5 7.5L10 2Z" fill="#2563eb"/>
+                                    </svg>
+                                </span>Copilot</span>
+                                <span class="model-badge"><span class="model-icon" title="Custom">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-label="Custom" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="20" height="20" rx="4" fill="#6366f1"/>
+                                        <path d="M10 6l2 2-2 2-2-2 2-2zm0 4l2 2-2 2-2-2 2-2z" fill="#fff"/>
+                                    </svg>
+                                </span>Custom</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Token Efficiency Section -->
+    <section class="token-efficiency-section">
+        <div class="container">
+            <div class="efficiency-container">
+                <div class="efficiency-content slide-in-left">
+                    <div class="section-badge">💸 Cost Problem</div>
+                    <h2>Stop Wasting Tokens on Irrelevant Context</h2>
+                    <p class="section-subtitle">
+                        Current AI coding tools send massive amounts of irrelevant code as context, burning through your token budget 
+                        and often missing the crucial details your AI actually needs.
+                    </p>
+                    
+                    <div class="problem-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">90%</div>
+                            <div class="stat-label">Context is Irrelevant</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">10x</div>
+                            <div class="stat-label">Higher Token Costs</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">60%</div>
+                            <div class="stat-label">Wrong Suggestions</div>
+                        </div>
+                    </div>
+                    
+                    <div class="solution-highlight">
+                        <h4>🎯 Code Atlas Solution</h4>
+                        <p>Our knowledge graph automatically identifies and sends only the precise context your AI needs - 
+                        reducing token usage by 85% while improving accuracy by 3x.</p>
+                    </div>
+                </div>
+                
+                <div class="efficiency-visualization slide-in-right">
+                    <div class="comparison-demo">
+                        <div class="demo-column">
+                            <div class="demo-header bad">
+                                <span class="demo-title">❌ Traditional Approach</span>
+                                <span class="token-count">15,000 tokens</span>
+                            </div>
+                            <div class="context-blocks">
+                                <div class="context-block irrelevant">Entire file contents</div>
+                                <div class="context-block irrelevant">Unrelated imports</div>
+                                <div class="context-block irrelevant">Test files</div>
+                                <div class="context-block irrelevant">Config files</div>
+                                <div class="context-block relevant">Relevant function</div>
+                                <div class="context-block irrelevant">Documentation</div>
+                                <div class="context-block irrelevant">Legacy code</div>
+                            </div>
+                            <div class="result-indicator bad">
+                                <span>🔴 Inefficient & Expensive</span>
+                            </div>
+                        </div>
+                        
+                        <div class="vs-divider">VS</div>
+                        
+                        <div class="demo-column">
+                            <div class="demo-header good">
+                                <span class="demo-title">✅ Code Atlas</span>
+                                <span class="token-count">2,200 tokens</span>
+                            </div>
+                            <div class="context-blocks">
+                                <div class="context-block relevant">Target function</div>
+                                <div class="context-block relevant">Dependencies</div>
+                                <div class="context-block relevant">Related types</div>
+                                <div class="context-block relevant">Usage patterns</div>
+                            </div>
+                            <div class="result-indicator good">
+                                <span>🟢 Precise & Cost-Effective</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="smart-context-flow">
+                        <div class="flow-title">Smart Context Selection</div>
+                        <div class="context-steps">
+                            <div class="context-step">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Analyze Request</div>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="context-step">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Query Knowledge Graph</div>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="context-step">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Select Precise Context</div>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="context-step">
+                                <div class="step-number">4</div>
+                                <div class="step-text">Send to AI</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Demo Section -->
+    <section class="demo-section" id="demo">
+        <div class="container-wide">
+            <div class="demo-container">
+                <div class="demo-content slide-in-left">
+                    <h2>Real-Time Code Analysis</h2>
+                    <p>
+                        Watch as Code Atlas analyzes your codebase in real-time, building a comprehensive 
+                        understanding of your architecture, dependencies, and potential issues.
+                    </p>
+                    <ul class="demo-features">
+                        <li>Instant dependency graph generation</li>
+                        <li>Complexity analysis and risk assessment</li>
+                        <li>AI-powered semantic understanding</li>
+                        <li>Interactive visualizations</li>
+                    </ul>
+                    <a href="#" class="cta-button">Try Demo</a>
+                </div>
+                <div class="demo-visualization slide-in-right">
+                    <div class="interactive-demo" id="live-demo">
+                        <div class="demo-line">🚀 Starting Code Atlas analysis...</div>
+                        <div class="demo-line">📁 Discovering source files...</div>
+                        <div class="demo-line">🔍 Analyzing 127 files...</div>
+                        <div class="demo-line">📊 Building dependency graph...</div>
+                        <div class="demo-line">🤖 Applying AI insights...</div>
+                        <div class="demo-line">📈 Generating visualizations...</div>
+                        <div class="demo-line">✅ Analysis complete!</div>
+                        <div class="demo-line">📋 Found 45 high-risk functions</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="text-center fade-in">
+                <h2>One Platform. Unlimited Insights.</h2>
+                <p>
+                    Everything you need to understand, analyze, and improve your codebase at scale.
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔗</div>
+                    <h3>Dependency Mapping</h3>
+                    <p>
+                        Visualize complex dependency relationships with interactive graphs. 
+                        Identify circular dependencies and architectural bottlenecks instantly.
+                    </p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">📊</div>
+                    <h3>Complexity Analysis</h3>
+                    <p>
+                        Measure code complexity with advanced metrics. Identify hotspots and 
+                        prioritize refactoring efforts with data-driven insights.
+                    </p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI-Powered Insights</h3>
+                    <p>
+                        Leverage machine learning to understand code purpose, business value, 
+                        and technical debt. Get intelligent recommendations for improvement.
+                    </p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Risk Assessment</h3>
+                    <p>
+                        Automatically identify high-risk functions and modules. 
+                        Prioritize testing and refactoring based on impact analysis.
+                    </p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">📈</div>
+                    <h3>Performance Metrics</h3>
+                    <p>
+                        Track code quality over time with comprehensive metrics. 
+                        Monitor technical debt and maintainability scores.
+                    </p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Team Collaboration</h3>
+                    <p>
+                        Share insights with stakeholders through interactive dashboards. 
+                        Enable data-driven decision making across your organization.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visualization Demo -->
+    <section class="visualization-demo">
+        <div class="container">
+            <div class="text-center fade-in">
+                <h2>Interactive Visualizations</h2>
+                <p>
+                    Explore your codebase through multiple visualization types, each designed 
+                    to reveal different aspects of your architecture.
+                </p>
+            </div>
+            
+            <div class="demo-tabs fade-in">
+                <button class="demo-tab active" onclick="switchDemo('dependency')">Dependency Graph</button>
+                <button class="demo-tab" onclick="switchDemo('complexity')">Complexity Heatmap</button>
+                <button class="demo-tab" onclick="switchDemo('callgraph')">Call Graph</button>
+                <button class="demo-tab" onclick="switchDemo('techdebt')">Tech Debt Dashboard</button>
+            </div>
+            
+            <div class="demo-content fade-in">
+                <div id="demo-visualization"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item fade-in">
+                    <h3>10x</h3>
+                    <p>Faster Code Reviews</p>
+                </div>
+                <div class="stat-item fade-in">
+                    <h3>85%</h3>
+                    <p>Reduction in Technical Debt</p>
+                </div>
+                <div class="stat-item fade-in">
+                    <h3>50+</h3>
+                    <p>Programming Languages</p>
+                </div>
+                <div class="stat-item fade-in">
+                    <h3>24/7</h3>
+                    <p>Continuous Analysis</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="pricing">
+        <div class="container">
+            <h2 class="fade-in">Ready to Transform Your Codebase?</h2>
+            <p class="fade-in">
+                Join thousands of engineering teams who are already using WorkOS Code Atlas 
+                to build better software at scale.
+            </p>
+            <div class="hero-buttons fade-in">
+                <a href="#" class="cta-button">Start Free Trial</a>
+                <a href="#" class="secondary-button">Schedule Demo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 WorkOS Code Atlas. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = '0s';
+                    entry.target.style.animationFillMode = 'forwards';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Hero Demo - Complex, chaotic software architecture showing the need for WorkOS
+        function createHeroDemo() {
+            const container = document.getElementById('hero-demo');
+            container.innerHTML = ''; // Clear previous content
+            
+            const width = 1000;
+            const height = 500;
+            
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('viewBox', `0 0 ${width} ${height}`)
+                .attr('preserveAspectRatio', 'xMidYMid meet')
+                .style('width', '100%')
+                .style('height', '100%');
+
+            // Complex, overwhelming software architecture - spread across full area
+            const nodes = [
+                // Frontend Layer (top-left quadrant)
+                { name: 'React App', x: 120, y: 80, color: '#6366f1', size: 25, complexity: 'high' },
+                { name: 'Vue Dashboard', x: 200, y: 120, color: '#6366f1', size: 20, complexity: 'medium' },
+                { name: 'Angular Admin', x: 80, y: 160, color: '#6366f1', size: 18, complexity: 'high' },
+                { name: 'Mobile App', x: 280, y: 90, color: '#6366f1', size: 22, complexity: 'medium' },
+                { name: 'Legacy UI', x: 150, y: 200, color: '#6366f1', size: 15, complexity: 'high' },
+                
+                // API Layer (top-center)
+                { name: 'API Gateway v1', x: 400, y: 60, color: '#10b981', size: 28, complexity: 'high' },
+                { name: 'API Gateway v2', x: 480, y: 120, color: '#10b981', size: 30, complexity: 'high' },
+                { name: 'GraphQL API', x: 350, y: 180, color: '#10b981', size: 25, complexity: 'medium' },
+                { name: 'REST API', x: 520, y: 80, color: '#10b981', size: 24, complexity: 'medium' },
+                
+                // Microservices (center spread)
+                { name: 'Auth Service', x: 600, y: 50, color: '#f59e0b', size: 22, complexity: 'high' },
+                { name: 'User Service', x: 550, y: 140, color: '#f59e0b', size: 20, complexity: 'medium' },
+                { name: 'Payment Service', x: 680, y: 100, color: '#f59e0b', size: 24, complexity: 'high' },
+                { name: 'Order Service', x: 620, y: 200, color: '#f59e0b', size: 18, complexity: 'medium' },
+                { name: 'Inventory Service', x: 720, y: 160, color: '#f59e0b', size: 19, complexity: 'high' },
+                { name: 'Email Service', x: 500, y: 220, color: '#f59e0b', size: 16, complexity: 'low' },
+                { name: 'SMS Service', x: 760, y: 80, color: '#f59e0b', size: 17, complexity: 'medium' },
+                { name: 'Analytics Service', x: 650, y: 260, color: '#f59e0b', size: 21, complexity: 'high' },
+                { name: 'Search Service', x: 580, y: 300, color: '#f59e0b', size: 20, complexity: 'medium' },
+                
+                // Data Layer (top-right)
+                { name: 'PostgreSQL', x: 850, y: 90, color: '#ef4444', size: 32, complexity: 'high' },
+                { name: 'MongoDB', x: 820, y: 160, color: '#ef4444', size: 28, complexity: 'medium' },
+                { name: 'Redis Cache', x: 900, y: 140, color: '#ef4444', size: 24, complexity: 'medium' },
+                { name: 'Elasticsearch', x: 880, y: 220, color: '#ef4444', size: 26, complexity: 'high' },
+                { name: 'S3 Storage', x: 950, y: 120, color: '#ef4444', size: 22, complexity: 'low' },
+                { name: 'DynamoDB', x: 920, y: 200, color: '#ef4444', size: 20, complexity: 'medium' },
+                
+                // Infrastructure (bottom spread)
+                { name: 'Load Balancer', x: 100, y: 350, color: '#8b5cf6', size: 20, complexity: 'medium' },
+                { name: 'CDN', x: 200, y: 400, color: '#8b5cf6', size: 18, complexity: 'low' },
+                { name: 'Kubernetes', x: 350, y: 370, color: '#8b5cf6', size: 26, complexity: 'high' },
+                { name: 'Docker', x: 450, y: 420, color: '#8b5cf6', size: 22, complexity: 'medium' },
+                { name: 'Monitoring', x: 600, y: 380, color: '#8b5cf6', size: 24, complexity: 'high' },
+                { name: 'Logging', x: 750, y: 430, color: '#8b5cf6', size: 20, complexity: 'medium' },
+                { name: 'CI/CD Pipeline', x: 500, y: 450, color: '#8b5cf6', size: 25, complexity: 'high' },
+                
+                // Third-party integrations (scattered)
+                { name: 'Stripe', x: 50, y: 280, color: '#06b6d4', size: 18, complexity: 'medium' },
+                { name: 'Twilio', x: 300, y: 320, color: '#06b6d4', size: 16, complexity: 'low' },
+                { name: 'AWS Lambda', x: 800, y: 350, color: '#06b6d4', size: 20, complexity: 'medium' },
+                { name: 'Firebase', x: 900, y: 400, color: '#06b6d4', size: 19, complexity: 'medium' },
+                { name: 'Zendesk', x: 950, y: 300, color: '#06b6d4', size: 17, complexity: 'low' },
+                
+                // Additional scattered services for more chaos
+                { name: 'Message Queue', x: 50, y: 120, color: '#f59e0b', size: 18, complexity: 'medium' },
+                { name: 'File Storage', x: 950, y: 50, color: '#ef4444', size: 20, complexity: 'low' },
+                { name: 'WebSocket', x: 250, y: 280, color: '#10b981', size: 16, complexity: 'medium' },
+                { name: 'Cron Jobs', x: 50, y: 450, color: '#8b5cf6', size: 14, complexity: 'low' },
+                { name: 'Backup Service', x: 850, y: 450, color: '#06b6d4', size: 15, complexity: 'low' }
+            ];
+
+            // Create a web of complex interconnections
+            const links = [];
+            
+            // Frontend to API connections
+            for (let i = 0; i < 5; i++) {
+                for (let j = 5; j < 9; j++) {
+                    if (Math.random() > 0.3) {
+                        links.push({ source: nodes[i], target: nodes[j], strength: Math.random() > 0.5 ? 2 : 1 });
+                    }
+                }
+            }
+            
+            // API to Microservices connections
+            for (let i = 5; i < 9; i++) {
+                for (let j = 9; j < 18; j++) {
+                    if (Math.random() > 0.4) {
+                        links.push({ source: nodes[i], target: nodes[j], strength: Math.random() > 0.6 ? 3 : 2 });
+                    }
+                }
+            }
+            
+            // Microservices to Data connections
+            for (let i = 9; i < 18; i++) {
+                for (let j = 18; j < 24; j++) {
+                    if (Math.random() > 0.5) {
+                        links.push({ source: nodes[i], target: nodes[j], strength: Math.random() > 0.7 ? 3 : 1 });
+                    }
+                }
+            }
+            
+            // Add some chaotic cross-connections
+            links.push(
+                { source: nodes[0], target: nodes[15], strength: 2 }, // React to Payment
+                { source: nodes[2], target: nodes[20], strength: 1 }, // Angular to PostgreSQL
+                { source: nodes[10], target: nodes[12], strength: 3 }, // Auth to Payment
+                { source: nodes[11], target: nodes[13], strength: 2 }, // User to Order
+                { source: nodes[14], target: nodes[16], strength: 1 }, // Inventory to SMS
+                { source: nodes[25], target: nodes[28], strength: 2 }, // Kubernetes to Monitoring
+            );
+
+            // Draw chaotic connection lines first
+            const linkGroup = svg.append('g');
+            links.forEach((link, i) => {
+                const line = linkGroup.append('line')
+                    .attr('x1', link.source.x)
+                    .attr('y1', link.source.y)
+                    .attr('x2', link.target.x)
+                    .attr('y2', link.target.y)
+                    .attr('stroke', link.strength === 3 ? '#ef4444' : link.strength === 2 ? '#f59e0b' : '#d1d5db')
+                    .attr('stroke-width', link.strength)
+                    .attr('opacity', 0)
+                    .transition()
+                    .delay(i * 30)
+                    .duration(500)
+                    .attr('opacity', 0.4);
+                    
+                // Add pulsing to high-strength connections
+                if (link.strength === 3) {
+                    line.transition()
+                        .delay(i * 30 + 1000)
+                        .duration(1500)
+                        .ease(d3.easeSinInOut)
+                        .attr('opacity', 0.8)
+                        .transition()
+                        .duration(1500)
+                        .ease(d3.easeSinInOut)
+                        .attr('opacity', 0.4)
+                        .on('end', function repeat() {
+                            d3.select(this)
+                                .transition()
+                                .duration(1500)
+                                .ease(d3.easeSinInOut)
+                                .attr('opacity', 0.8)
+                                .transition()
+                                .duration(1500)
+                                .ease(d3.easeSinInOut)
+                                .attr('opacity', 0.4)
+                                .on('end', repeat);
+                        });
+                }
+            });
+
+            // Draw overwhelming number of nodes
+            const nodeGroup = svg.append('g');
+            nodes.forEach((node, i) => {
+                const circle = nodeGroup.append('circle')
+                    .attr('cx', node.x)
+                    .attr('cy', node.y)
+                    .attr('r', 0)
+                    .attr('fill', node.color)
+                    .attr('stroke', node.complexity === 'high' ? '#ef4444' : node.complexity === 'medium' ? '#f59e0b' : '#10b981')
+                    .attr('stroke-width', node.complexity === 'high' ? 3 : 2)
+                    .attr('opacity', 0);
+
+                // Staggered appearance
+                circle.transition()
+                    .delay(i * 80)
+                    .duration(400)
+                    .attr('r', node.size)
+                    .attr('opacity', 1);
+
+                // Chaotic pulsing for high complexity nodes
+                if (node.complexity === 'high') {
+                    circle.transition()
+                        .delay(i * 80 + 2000)
+                        .duration(1000 + Math.random() * 1000)
+                        .ease(d3.easeSinInOut)
+                        .attr('r', node.size * 1.3)
+                        .transition()
+                        .duration(1000 + Math.random() * 1000)
+                        .ease(d3.easeSinInOut)
+                        .attr('r', node.size)
+                        .on('end', function repeat() {
+                            d3.select(this)
+                                .transition()
+                                .duration(1000 + Math.random() * 1000)
+                                .ease(d3.easeSinInOut)
+                                .attr('r', node.size * 1.3)
+                                .transition()
+                                .duration(1000 + Math.random() * 1000)
+                                .ease(d3.easeSinInOut)
+                                .attr('r', node.size)
+                                .on('end', repeat);
+                        });
+                }
+
+                // Add small labels (overwhelming text)
+                nodeGroup.append('text')
+                    .attr('x', node.x)
+                    .attr('y', node.y + node.size + 15)
+                    .attr('text-anchor', 'middle')
+                    .attr('font-size', '9px')
+                    .attr('font-weight', '500')
+                    .attr('fill', '#374151')
+                    .attr('opacity', 0)
+                    .text(node.name)
+                    .transition()
+                    .delay(i * 80 + 300)
+                    .duration(400)
+                    .attr('opacity', 0.8);
+            });
+
+            // Add overwhelming complexity indicators
+            setTimeout(() => {
+                nodes.forEach((node, i) => {
+                    if (node.complexity === 'high') {
+                        nodeGroup.append('text')
+                            .attr('x', node.x)
+                            .attr('y', node.y - node.size - 8)
+                            .attr('text-anchor', 'middle')
+                            .attr('font-size', '12px')
+                            .attr('opacity', 0)
+                            .text('⚠️')
+                            .transition()
+                            .delay(i * 50)
+                            .duration(400)
+                            .attr('opacity', 1);
+                    }
+                });
+                
+                // Add "CHAOS" text overlay
+                svg.append('text')
+                    .attr('x', width / 2)
+                    .attr('y', 50)
+                    .attr('text-anchor', 'middle')
+                    .attr('font-size', '24px')
+                    .attr('font-weight', 'bold')
+                    .attr('fill', '#ef4444')
+                    .attr('opacity', 0)
+                    .text('OVERWHELMING COMPLEXITY')
+                    .transition()
+                    .delay(3000)
+                    .duration(1000)
+                    .attr('opacity', 0.8)
+                    .transition()
+                    .delay(2000)
+                    .duration(1000)
+                    .attr('opacity', 0);
+                    
+            }, 2500);
+        }
+
+        // Demo Visualizations
+        let currentDemo = 'dependency';
+
+        function switchDemo(type) {
+            currentDemo = type;
+            
+            // Update tab states
+            document.querySelectorAll('.demo-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Clear and recreate visualization
+            const container = document.getElementById('demo-visualization');
+            container.innerHTML = '';
+            
+            switch(type) {
+                case 'dependency':
+                    createDependencyDemo();
+                    break;
+                case 'complexity':
+                    createComplexityDemo();
+                    break;
+                case 'callgraph':
+                    createCallGraphDemo();
+                    break;
+                case 'techdebt':
+                    createTechDebtDemo();
+                    break;
+            }
+        }
+
+        function createDependencyDemo() {
+            const container = document.getElementById('demo-visualization');
+            const width = container.clientWidth;
+            const height = 350;
+
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            // Sample dependency data
+            const nodes = [
+                { id: 'frontend', name: 'Frontend', group: 'frontend', size: 20 },
+                { id: 'backend', name: 'Backend API', group: 'backend', size: 18 },
+                { id: 'database', name: 'Database', group: 'data', size: 15 },
+                { id: 'auth', name: 'Authentication', group: 'security', size: 12 },
+                { id: 'payment', name: 'Payment Service', group: 'service', size: 14 },
+                { id: 'email', name: 'Email Service', group: 'service', size: 10 }
+            ];
+
+            const links = [
+                { source: 'frontend', target: 'backend', strength: 2 },
+                { source: 'backend', target: 'database', strength: 1 },
+                { source: 'backend', target: 'auth', strength: 1 },
+                { source: 'backend', target: 'payment', strength: 1 },
+                { source: 'backend', target: 'email', strength: 1 }
+            ];
+
+            const simulation = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(links).id(d => d.id).distance(100))
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('center', d3.forceCenter(width / 2, height / 2));
+
+            const link = svg.append('g')
+                .selectAll('line')
+                .data(links)
+                .enter().append('line')
+                .attr('stroke', '#9ca3af')
+                .attr('stroke-width', d => Math.sqrt(d.strength) * 2);
+
+            const node = svg.append('g')
+                .selectAll('circle')
+                .data(nodes)
+                .enter().append('circle')
+                .attr('r', d => d.size)
+                .attr('fill', d => {
+                    const colors = { frontend: '#6366f1', backend: '#10b981', data: '#f59e0b', security: '#ef4444', service: '#8b5cf6' };
+                    return colors[d.group];
+                })
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 2);
+
+            const label = svg.append('g')
+                .selectAll('text')
+                .data(nodes)
+                .enter().append('text')
+                .text(d => d.name)
+                .attr('font-size', '12px')
+                .attr('text-anchor', 'middle')
+                .attr('dy', '0.35em')
+                .attr('fill', '#374151');
+
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                node
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y);
+
+                label
+                    .attr('x', d => d.x)
+                    .attr('y', d => d.y);
+            });
+        }
+
+        function createComplexityDemo() {
+            const container = document.getElementById('demo-visualization');
+            const width = container.clientWidth;
+            const height = 350;
+
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            // Sample complexity data
+            const data = [
+                { file: 'UserService.ts', complexity: 15, functions: 8 },
+                { file: 'AuthController.ts', complexity: 8, functions: 5 },
+                { file: 'Database.ts', complexity: 22, functions: 12 },
+                { file: 'PaymentAPI.ts', complexity: 18, functions: 10 },
+                { file: 'EmailService.ts', complexity: 6, functions: 3 },
+                { file: 'Utils.ts', complexity: 12, functions: 7 }
+            ];
+
+            const margin = { top: 20, right: 20, bottom: 40, left: 60 };
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
+
+            const x = d3.scaleBand()
+                .domain(data.map(d => d.file))
+                .range([0, chartWidth])
+                .padding(0.1);
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.complexity)])
+                .range([chartHeight, 0]);
+
+            const colorScale = d3.scaleSequential(d3.interpolateReds)
+                .domain([0, d3.max(data, d => d.complexity)]);
+
+            const chart = svg.append('g')
+                .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+            chart.selectAll('rect')
+                .data(data)
+                .enter().append('rect')
+                .attr('x', d => x(d.file))
+                .attr('y', d => y(d.complexity))
+                .attr('width', x.bandwidth())
+                .attr('height', d => chartHeight - y(d.complexity))
+                .attr('fill', d => colorScale(d.complexity))
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 1);
+
+            // Add axes
+            chart.append('g')
+                .attr('transform', `translate(0, ${chartHeight})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .attr('transform', 'rotate(-45)')
+                .style('text-anchor', 'end');
+
+            chart.append('g')
+                .call(d3.axisLeft(y));
+        }
+
+        function createCallGraphDemo() {
+            const container = document.getElementById('demo-visualization');
+            const width = container.clientWidth;
+            const height = 350;
+
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            // Sample call graph data
+            const nodes = [
+                { id: 'main', name: 'main()', complexity: 5 },
+                { id: 'process', name: 'processData()', complexity: 8 },
+                { id: 'validate', name: 'validate()', complexity: 3 },
+                { id: 'save', name: 'saveToDB()', complexity: 6 },
+                { id: 'notify', name: 'notifyUser()', complexity: 4 }
+            ];
+
+            const links = [
+                { source: 'main', target: 'process' },
+                { source: 'process', target: 'validate' },
+                { source: 'process', target: 'save' },
+                { source: 'main', target: 'notify' }
+            ];
+
+            const simulation = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(links).id(d => d.id).distance(80))
+                .force('charge', d3.forceManyBody().strength(-200))
+                .force('center', d3.forceCenter(width / 2, height / 2));
+
+            const link = svg.append('g')
+                .selectAll('line')
+                .data(links)
+                .enter().append('line')
+                .attr('stroke', '#9ca3af')
+                .attr('stroke-width', 1.5);
+
+            const node = svg.append('g')
+                .selectAll('circle')
+                .data(nodes)
+                .enter().append('circle')
+                .attr('r', d => Math.max(5, d.complexity * 1.5))
+                .attr('fill', d => d3.interpolateBlues(d.complexity / 10))
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 2);
+
+            const label = svg.append('g')
+                .selectAll('text')
+                .data(nodes)
+                .enter().append('text')
+                .text(d => d.name)
+                .attr('font-size', '11px')
+                .attr('text-anchor', 'middle')
+                .attr('dy', '0.35em')
+                .attr('fill', '#374151');
+
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                node
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y);
+
+                label
+                    .attr('x', d => d.x)
+                    .attr('y', d => d.y);
+            });
+        }
+
+        function createTechDebtDemo() {
+            const container = document.getElementById('demo-visualization');
+            const width = container.clientWidth;
+            const height = 350;
+
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            // Sample tech debt data
+            const data = [
+                { module: 'Frontend', debt: 25, risk: 'high' },
+                { module: 'Backend', debt: 15, risk: 'medium' },
+                { module: 'Database', debt: 8, risk: 'low' },
+                { module: 'Auth', debt: 30, risk: 'high' },
+                { module: 'Payment', debt: 12, risk: 'medium' }
+            ];
+
+            const margin = { top: 20, right: 20, bottom: 40, left: 60 };
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
+
+            const x = d3.scaleBand()
+                .domain(data.map(d => d.module))
+                .range([0, chartWidth])
+                .padding(0.1);
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.debt)])
+                .range([chartHeight, 0]);
+
+            const colorScale = d3.scaleOrdinal()
+                .domain(['low', 'medium', 'high'])
+                .range(['#10b981', '#f59e0b', '#ef4444']);
+
+            const chart = svg.append('g')
+                .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+            chart.selectAll('rect')
+                .data(data)
+                .enter().append('rect')
+                .attr('x', d => x(d.module))
+                .attr('y', d => y(d.debt))
+                .attr('width', x.bandwidth())
+                .attr('height', d => chartHeight - y(d.debt))
+                .attr('fill', d => colorScale(d.risk))
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 1);
+
+            // Add axes
+            chart.append('g')
+                .attr('transform', `translate(0, ${chartHeight})`)
+                .call(d3.axisBottom(x));
+
+            chart.append('g')
+                .call(d3.axisLeft(y));
+        }
+
+        // Initialize demos
+        document.addEventListener('DOMContentLoaded', () => {
+            // A small delay ensures the container has its final dimensions before drawing.
+            setTimeout(() => {
+                createHeroDemo();
+            }, 100);
+            createDependencyDemo();
+        });
+
+        // The resize listener is no longer needed with the viewBox approach.
+        // window.addEventListener('resize', () => {
+        //     createHeroDemo();
+        // });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

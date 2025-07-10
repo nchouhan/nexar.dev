@@ -1232,6 +1232,211 @@
             height: 300px !important;
             display: block;
         }
+
+        /* Coming Soon Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-4);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .coming-soon-modal {
+            background: var(--white);
+            border-radius: var(--radius-2xl);
+            padding: var(--spacing-8);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            box-shadow: var(--shadow-xl);
+            animation: slideInUp 0.4s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: var(--spacing-4);
+            right: var(--spacing-4);
+            background: none;
+            border: none;
+            font-size: var(--font-size-2xl);
+            color: var(--gray-400);
+            cursor: pointer;
+            padding: var(--spacing-2);
+            border-radius: var(--radius-full);
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .coming-soon-icon {
+            font-size: var(--font-size-6xl);
+            margin-bottom: var(--spacing-4);
+            display: block;
+        }
+
+        .coming-soon-title {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--spacing-4);
+        }
+
+        .coming-soon-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--gray-600);
+            margin-bottom: var(--spacing-6);
+            line-height: 1.6;
+        }
+
+        .coming-soon-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-4);
+            margin-bottom: var(--spacing-8);
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            padding: var(--spacing-3);
+            background: var(--gray-50);
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-sm);
+            color: var(--gray-700);
+        }
+
+        .feature-item .icon {
+            font-size: var(--font-size-lg);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: var(--spacing-4);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-button {
+            padding: var(--spacing-3) var(--spacing-6);
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-size: var(--font-size-base);
+        }
+
+        .modal-button.primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .modal-button.primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-button.secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-200);
+        }
+
+        .modal-button.secondary:hover {
+            background: var(--gray-200);
+            color: var(--gray-800);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-bottom: var(--spacing-6);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: var(--radius-full);
+            animation: progressAnimation 2s ease-in-out infinite;
+        }
+
+        @keyframes progressAnimation {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            padding: var(--spacing-2) var(--spacing-4);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            margin-bottom: var(--spacing-4);
+        }
+
+        @media (max-width: 768px) {
+            .coming-soon-modal {
+                padding: var(--spacing-6);
+                margin: var(--spacing-4);
+            }
+
+            .coming-soon-features {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .coming-soon-title {
+                font-size: var(--font-size-2xl);
+            }
+        }
     </style>
 </head>
 <body>
@@ -1297,7 +1502,7 @@
                     <a href="#demo" class="nav-link">Demo</a>
                     <a href="#pricing" class="nav-link">Pricing</a>
                     <a href="#contact" class="nav-link">Contact</a>
-                    <a href="#" class="cta-button">Get Started</a>
+                    <a href="#" class="cta-button" onclick="showComingSoon()">Get Started</a>
                 </nav>
             </div>
         </div>
@@ -1313,7 +1518,7 @@
                 hidden patterns, dependencies, and risks.
             </p>
             <div class="hero-buttons fade-in">
-                <a href="#demo" class="cta-button">Escape the Chaos</a>
+                <a href="#" class="cta-button" onclick="showComingSoon()">Escape the Chaos</a>
                 <a href="#features" class="secondary-button">See the Solution</a>
             </div>
             
@@ -1632,7 +1837,7 @@
                         <li>AI-powered semantic understanding</li>
                         <li>Interactive visualizations</li>
                     </ul>
-                    <a href="#" class="cta-button">Try Demo</a>
+                    <a href="#" class="cta-button" onclick="showComingSoon()">Try Demo</a>
                 </div>
                 <div class="demo-visualization slide-in-right">
                     <div class="interactive-demo" id="live-demo">
@@ -1662,6 +1867,24 @@
             
             <div class="features-grid">
                 <div class="feature-card fade-in">
+                    <div class="feature-icon">🤖</div>
+                    <h3>Intelligent Coding Agent</h3>
+                    <p>
+                        Your AI coding partner that understands your entire codebase. Provides 
+                        context-aware code generation, refactoring suggestions, and intelligent assistance.
+                    </p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🗺️</div>
+                    <h3>Knowledge Graph Partnership</h3>
+                    <p>
+                        Your code + knowledge graph = perfect partnership. Every repository becomes 
+                        a self-contained, AI-ready codebase that any coding model can instantly understand.
+                    </p>
+                </div>
+                
+                <div class="feature-card fade-in">
                     <div class="feature-icon">🔗</div>
                     <h3>Dependency Mapping</h3>
                     <p>
@@ -1680,15 +1903,6 @@
                 </div>
                 
                 <div class="feature-card fade-in">
-                    <div class="feature-icon">🤖</div>
-                    <h3>AI-Powered Insights</h3>
-                    <p>
-                        Leverage machine learning to understand code purpose, business value, 
-                        and technical debt. Get intelligent recommendations for improvement.
-                    </p>
-                </div>
-                
-                <div class="feature-card fade-in">
                     <div class="feature-icon">🔍</div>
                     <h3>Risk Assessment</h3>
                     <p>
@@ -1703,15 +1917,6 @@
                     <p>
                         Track code quality over time with comprehensive metrics. 
                         Monitor technical debt and maintainability scores.
-                    </p>
-                </div>
-                
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Team Collaboration</h3>
-                    <p>
-                        Share insights with stakeholders through interactive dashboards. 
-                        Enable data-driven decision making across your organization.
                     </p>
                 </div>
             </div>
@@ -1775,8 +1980,8 @@
                 to build better software at scale.
             </p>
             <div class="hero-buttons fade-in">
-                <a href="#" class="cta-button">Start Free Trial</a>
-                <a href="#" class="secondary-button">Schedule Demo</a>
+                <a href="#" class="cta-button" onclick="showComingSoon()">Start Free Trial</a>
+                <a href="#" class="secondary-button" onclick="showComingSoon()">Schedule Demo</a>
             </div>
         </div>
     </section>
@@ -1787,6 +1992,57 @@
             <p>&copy; 2024 WorkOS Code Atlas. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Coming Soon Modal -->
+    <div class="modal-overlay" id="comingSoonModal">
+        <div class="coming-soon-modal">
+            <button class="modal-close" onclick="hideComingSoon()">×</button>
+            
+            <div class="status-badge">🚀 Coming Soon</div>
+            
+            <div class="coming-soon-icon">🤖</div>
+            <h2 class="coming-soon-title">We're Building the Future of AI Coding</h2>
+            <p class="coming-soon-subtitle">
+                Crafting the most intelligent 
+                AI coding platform that understands your codebase like never before, providing 
+                context-aware assistance and deep insights for every coding task.
+            </p>
+            
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            
+            <div class="coming-soon-features">
+                <div class="feature-item">
+                    <span class="icon">🧠</span>
+                    <span>Deep AI Intelligence</span>
+                </div>
+                <div class="feature-item">
+                    <span class="icon">💻</span>
+                    <span>Smart Code Generation</span>
+                </div>
+                <div class="feature-item">
+                    <span class="icon">🗺️</span>
+                    <span>Knowledge Graph Context</span>
+                </div>
+                <div class="feature-item">
+                    <span class="icon">⚡</span>
+                    <span>Context-Aware Assistance</span>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="modal-button primary" onclick="sendEmail()">
+                    <span>📧</span>
+                    <span>Drop a Message</span>
+                </button>
+                <button class="modal-button secondary" onclick="hideComingSoon()">
+                    <span>👋</span>
+                    <span>Stay Tuned</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Intersection Observer for animations
@@ -2082,20 +2338,139 @@
             
             switch(type) {
                 case 'dependency':
-                    createDependencyDemo();
+                createStyledDependencyGraphDemo();
                     break;
                 case 'complexity':
                     createComplexityDemo();
                     break;
                 case 'callgraph':
-                    createCallGraphDemo();
+                    createCallGraphTreeDemo();
                     break;
                 case 'techdebt':
                     createTechDebtDemo();
                     break;
             }
         }
+        function createCallGraphTreeDemo() {
+    // Convert your call graph data to a tree structure
+    // For this example, Main_Controller is the root
+    const treeData = {
+        name: "Main_Controller", type: "Module",
+        children: [
+            {
+                name: "Traffic_Sensor_Manager", type: "Module",
+                children: [
+                    {
+                        name: "Sensor_Data_Aggregator", type: "Function",
+                        children: [
+                            { name: "Main_Controller", type: "Module" }, // back edge, can be omitted for pure tree
+                            { name: "Anomaly_Detector", type: "Module" }
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "Traffic_Signal_Controller", type: "Module",
+                children: [
+                    { name: "Emergency_Vehicle_Prioritizer", type: "Function" },
+                    { name: "Manual_Override", type: "Function" }
+                ]
+            },
+            { name: "Route_Optimizer", type: "Module", children: [{ name: "Traffic_Signal_Controller", type: "Module" }] },
+            {
+                name: "Anomaly_Detector", type: "Module",
+                children: [
+                    { name: "Notification_Service", type: "Function" },
+                    { name: "Congestion_Predictor", type: "Function", children: [{ name: "Traffic_Signal_Controller", type: "Module" }] }
+                ]
+            },
+            { name: "Data_Logger", type: "Module", children: [{ name: "Database_Manager", type: "Function" }] }
+        ]
+    };
 
+    const colorByType = {
+        "Module": "#fbbf24",      // Amber
+        "Function": "#60a5fa",    // Blue
+        "Root": "#6366f1"         // Indigo
+    };
+
+    const container = document.getElementById('demo-visualization');
+    container.innerHTML = '';
+    const width = container.clientWidth || 800;
+    const height = 400;
+
+    const svg = d3.select(container)
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+    const root = d3.hierarchy(treeData);
+
+    const treeLayout = d3.tree().size([width - 40, height - 40]);
+    treeLayout(root);
+
+    // Draw links
+    svg.append('g')
+        .selectAll('path')
+        .data(root.links())
+        .enter()
+        .append('path')
+        .attr('d', d3.linkVertical()
+            .x(d => d.x + 20)
+            .y(d => d.y + 20))
+        .attr('fill', 'none')
+        .attr('stroke', '#a5b4fc')
+        .attr('stroke-width', 2);
+
+    // Draw nodes
+    const node = svg.append('g')
+        .selectAll('g')
+        .data(root.descendants())
+        .enter()
+        .append('g')
+        .attr('transform', d => `translate(${d.x + 20},${d.y + 20})`);
+
+    node.each(function(d) {
+        // Create a temporary SVG text element to measure width
+        const tempText = svg.append('text')
+            .attr('font-size', 14)
+            .attr('font-family', 'monospace')
+            .attr('font-weight', 600)
+            .text(d.data.name.replace(/_/g, ' '));
+        const textWidth = tempText.node().getBBox().width;
+        tempText.remove();
+
+        // Set box width with padding
+        d.boxWidth = Math.max(100, textWidth + 24); // 12px padding on each side
+    });
+
+    // Draw rectangles with dynamic width
+    node.append('rect')
+        .attr('x', d => -d.boxWidth / 2)
+        .attr('y', -18)
+        .attr('width', d => d.boxWidth)
+        .attr('height', 36)
+        .attr('rx', 10)
+        .attr('fill', d => d.depth === 0 ? colorByType["Root"] : colorByType[d.data.type] || "#fff")
+        .attr('stroke', d => d.depth === 0 ? "#4338ca" : "#6366f1")
+        .attr('stroke-width', 2)
+        .attr('filter', 'url(#shadow)');
+
+    // Draw text centered
+    node.append('text')
+        .attr('text-anchor', 'middle')
+        .attr('dy', 6)
+        .attr('font-size', 14)
+        .attr('font-family', 'monospace')
+        .attr('font-weight', 600)
+        .attr('fill', d => d.depth === 0 ? "#fff" : "#222")
+        .text(d => d.data.name.replace(/_/g, ' '));
+
+    // Optional: Add drop shadow filter
+    svg.append('defs').append('filter')
+        .attr('id', 'shadow')
+        .html('<feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#888" flood-opacity="0.18"/>');
+}
         function createDependencyDemo() {
             const container = document.getElementById('demo-visualization');
             const width = container.clientWidth;
@@ -2176,44 +2551,84 @@
         }
 
         function createComplexityDemo() {
+            const data = [
+                {
+                    file: "UserService.ts",
+                    complexity: 85,
+                    risk: "High",
+                    issues: "Many nested conditions, long functions",
+                    action: "Refactor, split functions"
+                },
+                {
+                    file: "AuthController.ts",
+                    complexity: 60,
+                    risk: "Medium",
+                    issues: "Some duplicated logic",
+                    action: "Extract helpers"
+                },
+                {
+                    file: "Database.ts",
+                    complexity: 35,
+                    risk: "Low",
+                    issues: "Simple queries, well-structured",
+                    action: "Monitor"
+                },
+                {
+                    file: "PaymentAPI.ts",
+                    complexity: 70,
+                    risk: "High",
+                    issues: "Complex error handling, no tests",
+                    action: "Add tests, simplify error logic"
+                },
+                {
+                    file: "EmailService.ts",
+                    complexity: 40,
+                    risk: "Low",
+                    issues: "Straightforward logic",
+                    action: "No action needed"
+                },
+                {
+                    file: "Utils.ts",
+                    complexity: 55,
+                    risk: "Medium",
+                    issues: "Mixed utility functions, some unused",
+                    action: "Remove unused, document"
+                }
+            ];
+
+            const colorByRisk = {
+                "Low": "#10b981",
+                "Medium": "#f59e0b",
+                "High": "#ef4444"
+            };
+
             const container = document.getElementById('demo-visualization');
-            const width = container.clientWidth;
+            container.innerHTML = '';
+            const width = container.clientWidth || 700;
             const height = 350;
+
+            const margin = { top: 30, right: 30, bottom: 100, left: 60 };
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
 
             const svg = d3.select(container)
                 .append('svg')
                 .attr('width', width)
                 .attr('height', height);
 
-            // Sample complexity data
-            const data = [
-                { file: 'UserService.ts', complexity: 15, functions: 8 },
-                { file: 'AuthController.ts', complexity: 8, functions: 5 },
-                { file: 'Database.ts', complexity: 22, functions: 12 },
-                { file: 'PaymentAPI.ts', complexity: 18, functions: 10 },
-                { file: 'EmailService.ts', complexity: 6, functions: 3 },
-                { file: 'Utils.ts', complexity: 12, functions: 7 }
-            ];
-
-            const margin = { top: 20, right: 20, bottom: 40, left: 60 };
-            const chartWidth = width - margin.left - margin.right;
-            const chartHeight = height - margin.top - margin.bottom;
-
             const x = d3.scaleBand()
                 .domain(data.map(d => d.file))
                 .range([0, chartWidth])
-                .padding(0.1);
+                .padding(0.2);
 
             const y = d3.scaleLinear()
-                .domain([0, d3.max(data, d => d.complexity)])
+                .domain([0, 100])
                 .range([chartHeight, 0]);
-
-            const colorScale = d3.scaleSequential(d3.interpolateReds)
-                .domain([0, d3.max(data, d => d.complexity)]);
 
             const chart = svg.append('g')
                 .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
+            // Bars
             chart.selectAll('rect')
                 .data(data)
                 .enter().append('rect')
@@ -2221,20 +2636,60 @@
                 .attr('y', d => y(d.complexity))
                 .attr('width', x.bandwidth())
                 .attr('height', d => chartHeight - y(d.complexity))
-                .attr('fill', d => colorScale(d.complexity))
+                .attr('fill', d => colorByRisk[d.risk])
+                .attr('rx', 6)
                 .attr('stroke', '#fff')
                 .attr('stroke-width', 1);
 
-            // Add axes
+            // File labels (angled)
             chart.append('g')
                 .attr('transform', `translate(0, ${chartHeight})`)
                 .call(d3.axisBottom(x))
                 .selectAll('text')
-                .attr('transform', 'rotate(-45)')
-                .style('text-anchor', 'end');
+                .attr('transform', 'rotate(-30)')
+                .style('text-anchor', 'end')
+                .style('font-size', '13px');
 
+            // Y axis
             chart.append('g')
                 .call(d3.axisLeft(y));
+
+            // Complexity score labels
+            chart.selectAll('.complexity-label')
+                .data(data)
+                .enter().append('text')
+                .attr('class', 'complexity-label')
+                .attr('x', d => x(d.file) + x.bandwidth() / 2)
+                .attr('y', d => y(d.complexity) - 8)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '13px')
+                .attr('font-weight', 700)
+                .attr('fill', d => colorByRisk[d.risk])
+                .text(d => d.complexity);
+
+            // Add issues and action as tooltips
+            chart.selectAll('rect')
+                .on('mouseover', function(event, d) {
+                    d3.select(container).append('div')
+                        .attr('class', 'tooltip')
+                        .style('position', 'absolute')
+                        .style('left', (event.offsetX + 20) + 'px')
+                        .style('top', (event.offsetY - 10) + 'px')
+                        .style('background', '#fff')
+                        .style('color', '#222')
+                        .style('padding', '10px 16px')
+                        .style('border-radius', '8px')
+                        .style('box-shadow', '0 2px 8px rgba(0,0,0,0.15)')
+                        .style('font-size', '14px')
+                        .style('opacity', 1)
+                        .html(`<strong>${d.file}</strong><br>
+                            <b>Risk:</b> <span style="color:${colorByRisk[d.risk]}">${d.risk}</span><br>
+                            <b>Issues:</b> ${d.issues}<br>
+                            <b>Action:</b> ${d.action}`);
+                })
+                .on('mouseout', function() {
+                    d3.select(container).selectAll('.tooltip').remove();
+                });
         }
 
         function createCallGraphDemo() {
@@ -2312,44 +2767,77 @@
         }
 
         function createTechDebtDemo() {
+            const data = [
+                {
+                    module: "UserService",
+                    debt: 72,
+                    risk: "High",
+                    issues: "Duplicate logic, no input validation",
+                    action: "Refactor, add validation"
+                },
+                {
+                    module: "ProductService",
+                    debt: 55,
+                    risk: "Medium",
+                    issues: "Outdated dependencies",
+                    action: "Upgrade libraries"
+                },
+                {
+                    module: "DatabaseModule",
+                    debt: 30,
+                    risk: "Low",
+                    issues: "No automated backups",
+                    action: "Implement backup scripts"
+                },
+                {
+                    module: "InventoryService",
+                    debt: 65,
+                    risk: "High",
+                    issues: "No tests, complex queries",
+                    action: "Add tests, optimize queries"
+                },
+                {
+                    module: "AnalyticsModule",
+                    debt: 40,
+                    risk: "Medium",
+                    issues: "Hardcoded config",
+                    action: "Externalize config"
+                }
+            ];
+
+            const colorByRisk = {
+                "Low": "#10b981",
+                "Medium": "#f59e0b",
+                "High": "#ef4444"
+            };
+
             const container = document.getElementById('demo-visualization');
-            const width = container.clientWidth;
+            container.innerHTML = '';
+            const width = container.clientWidth || 700;
             const height = 350;
+
+            const margin = { top: 30, right: 30, bottom: 100, left: 60 };
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
 
             const svg = d3.select(container)
                 .append('svg')
                 .attr('width', width)
                 .attr('height', height);
 
-            // Sample tech debt data
-            const data = [
-                { module: 'Frontend', debt: 25, risk: 'high' },
-                { module: 'Backend', debt: 15, risk: 'medium' },
-                { module: 'Database', debt: 8, risk: 'low' },
-                { module: 'Auth', debt: 30, risk: 'high' },
-                { module: 'Payment', debt: 12, risk: 'medium' }
-            ];
-
-            const margin = { top: 20, right: 20, bottom: 40, left: 60 };
-            const chartWidth = width - margin.left - margin.right;
-            const chartHeight = height - margin.top - margin.bottom;
-
             const x = d3.scaleBand()
                 .domain(data.map(d => d.module))
                 .range([0, chartWidth])
-                .padding(0.1);
+                .padding(0.2);
 
             const y = d3.scaleLinear()
-                .domain([0, d3.max(data, d => d.debt)])
+                .domain([0, 100])
                 .range([chartHeight, 0]);
-
-            const colorScale = d3.scaleOrdinal()
-                .domain(['low', 'medium', 'high'])
-                .range(['#10b981', '#f59e0b', '#ef4444']);
 
             const chart = svg.append('g')
                 .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
+            // Bars
             chart.selectAll('rect')
                 .data(data)
                 .enter().append('rect')
@@ -2357,18 +2845,100 @@
                 .attr('y', d => y(d.debt))
                 .attr('width', x.bandwidth())
                 .attr('height', d => chartHeight - y(d.debt))
-                .attr('fill', d => colorScale(d.risk))
+                .attr('fill', d => colorByRisk[d.risk])
+                .attr('rx', 6)
                 .attr('stroke', '#fff')
                 .attr('stroke-width', 1);
 
-            // Add axes
+            // Module labels (angled)
             chart.append('g')
                 .attr('transform', `translate(0, ${chartHeight})`)
-                .call(d3.axisBottom(x));
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .attr('transform', 'rotate(-30)')
+                .style('text-anchor', 'end')
+                .style('font-size', '13px');
 
+            // Y axis
             chart.append('g')
                 .call(d3.axisLeft(y));
+
+            // Debt score labels
+            chart.selectAll('.debt-label')
+                .data(data)
+                .enter().append('text')
+                .attr('class', 'debt-label')
+                .attr('x', d => x(d.module) + x.bandwidth() / 2)
+                .attr('y', d => y(d.debt) - 8)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '13px')
+                .attr('font-weight', 700)
+                .attr('fill', d => colorByRisk[d.risk])
+                .text(d => d.debt);
+
+            // Add issues and action as tooltips
+            chart.selectAll('rect')
+                .on('mouseover', function(event, d) {
+                    d3.select(container).append('div')
+                        .attr('class', 'tooltip')
+                        .style('position', 'absolute')
+                        .style('left', (event.offsetX + 20) + 'px')
+                        .style('top', (event.offsetY - 10) + 'px')
+                        .style('background', '#fff')
+                        .style('color', '#222')
+                        .style('padding', '10px 16px')
+                        .style('border-radius', '8px')
+                        .style('box-shadow', '0 2px 8px rgba(0,0,0,0.15)')
+                        .style('font-size', '14px')
+                        .style('opacity', 1)
+                        .html(`<strong>${d.module}</strong><br>
+                            <b>Risk:</b> <span style="color:${colorByRisk[d.risk]}">${d.risk}</span><br>
+                            <b>Issues:</b> ${d.issues}<br>
+                            <b>Action:</b> ${d.action}`);
+                })
+                .on('mouseout', function() {
+                    d3.select(container).selectAll('.tooltip').remove();
+                });
         }
+
+        // Modal Functions
+        function showComingSoon() {
+            const modal = document.getElementById('comingSoonModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideComingSoon() {
+            const modal = document.getElementById('comingSoonModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function sendEmail() {
+            const subject = encodeURIComponent('WorkOS Code Atlas - Interested in AI Coding Platform Early Access');
+            const body = encodeURIComponent(`Hi Nirdosh,
+
+I'm interested in WorkOS Code Atlas AI coding platform and would like to learn more about early access opportunities for your intelligent coding assistant.
+
+Best regards,
+[Your Name]`);
+            
+            window.open(`mailto:nirdosh.chouhan@gmail.com?subject=${subject}&body=${body}`, '_blank');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('comingSoonModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideComingSoon();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideComingSoon();
+            }
+        });
 
         // Initialize demos
         document.addEventListener('DOMContentLoaded', () => {
@@ -2397,6 +2967,315 @@
                 }
             });
         });
+        
+    function createStyledCallGraphDemo() {
+        const data = {
+            nodes: [
+                {id: "Main_Controller", type: "Module"},
+                {id: "Traffic_Sensor_Manager", type: "Module"},
+                {id: "Traffic_Signal_Controller", type: "Module"},
+                {id: "Route_Optimizer", type: "Module"},
+                {id: "Anomaly_Detector", type: "Module"},
+                {id: "Data_Logger", type: "Module"},
+                {id: "UI_Dashboard", type: "Module"},
+                {id: "Emergency_Vehicle_Prioritizer", type: "Function"},
+                {id: "Congestion_Predictor", type: "Function"},
+                {id: "Sensor_Data_Aggregator", type: "Function"},
+                {id: "Database_Manager", type: "Function"},
+                {id: "Notification_Service", type: "Function"},
+                {id: "Manual_Override", type: "Function"}
+            ],
+            edges: [
+                {source: "Main_Controller", target: "Traffic_Sensor_Manager"},
+                {source: "Main_Controller", target: "Traffic_Signal_Controller"},
+                {source: "Main_Controller", target: "Route_Optimizer"},
+                {source: "Main_Controller", target: "Anomaly_Detector"},
+                {source: "Main_Controller", target: "Data_Logger"},
+                {source: "Traffic_Sensor_Manager", target: "Sensor_Data_Aggregator"},
+                {source: "Sensor_Data_Aggregator", target: "Main_Controller"},
+                {source: "Sensor_Data_Aggregator", target: "Anomaly_Detector"},
+                {source: "Traffic_Signal_Controller", target: "Emergency_Vehicle_Prioritizer"},
+                {source: "Traffic_Signal_Controller", target: "Manual_Override"},
+                {source: "Route_Optimizer", target: "Traffic_Signal_Controller"},
+                {source: "Anomaly_Detector", target: "Notification_Service"},
+                {source: "Anomaly_Detector", target: "Congestion_Predictor"},
+                {source: "Data_Logger", target: "Database_Manager"},
+                {source: "UI_Dashboard", target: "Main_Controller"},
+                {source: "UI_Dashboard", target: "Manual_Override"},
+                {source: "UI_Dashboard", target: "Data_Logger"},
+                {source: "Congestion_Predictor", target: "Traffic_Signal_Controller"}
+            ]
+        };
+    
+        const container = document.getElementById('demo-visualization');
+        container.innerHTML = '';
+        const width = container.clientWidth || 700;
+        const height = 400;
+    
+        const colorByType = {
+            Module: "#fbbf24",      // Amber
+            Function: "#60a5fa"     // Blue
+        };
+    
+        const svg = d3.select(container)
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height);
+    
+        // Simulation
+        const simulation = d3.forceSimulation(data.nodes)
+            .force('link', d3.forceLink(data.edges).id(d => d.id).distance(120))
+            .force('charge', d3.forceManyBody().strength(-500))
+            .force('center', d3.forceCenter(width / 2, height / 2));
+    
+        // Draw edges
+        const link = svg.append('g')
+            .attr('stroke', '#bbb')
+            .attr('stroke-width', 3)
+            .selectAll('path')
+            .data(data.edges)
+            .enter().append('path')
+            .attr('fill', 'none')
+            .attr('stroke', (d, i) => d3.schemeCategory10[i % 10])
+            .attr('stroke-width', 3);
+    
+        // Draw nodes as rounded rectangles
+        const node = svg.append('g')
+            .selectAll('g')
+            .data(data.nodes)
+            .enter().append('g')
+            .call(d3.drag()
+                .on('start', dragstarted)
+                .on('drag', dragged)
+                .on('end', dragended)
+            );
+    
+        node.append('rect')
+            .attr('x', -55)
+            .attr('y', -22)
+            .attr('width', 110)
+            .attr('height', 44)
+            .attr('rx', 12)
+            .attr('fill', d => colorByType[d.type])
+            .attr('stroke', d => d.type === 'Module' ? '#f59e0b' : '#2563eb')
+            .attr('stroke-width', 3)
+            .attr('filter', 'url(#shadow)');
+    
+        node.append('text')
+            .attr('text-anchor', 'middle')
+            .attr('dy', 6)
+            .attr('font-size', 16)
+            .attr('font-family', 'monospace')
+            .attr('font-weight', 600)
+            .attr('fill', '#222')
+            .text(d => d.id.replace(/_/g, ' '));
+    
+        // Optional: Add drop shadow filter
+        svg.append('defs').append('filter')
+            .attr('id', 'shadow')
+            .html('<feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#888" flood-opacity="0.2"/>');
+    
+        simulation.on('tick', () => {
+            link.attr('d', d => {
+                const dx = d.target.x - d.source.x;
+                const dy = d.target.y - d.source.y;
+                const dr = Math.sqrt(dx * dx + dy * dy) * 0.7;
+                return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
+            });
+    
+            node.attr('transform', d => `translate(${d.x},${d.y})`);
+        });
+    
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+    }
+    
+    // To use this, call createStyledCallGraphDemo() when the relevant demo tab is selected.
+    
+    function createStyledDependencyGraphDemo() {
+        const data = {
+            nodes: [
+                {id: "WebApp_Main"},
+                {id: "UserService"},
+                {id: "ProductService"},
+                {id: "DatabaseModule"},
+                {id: "InventoryService"},
+                {id: "RecommendationEngine"},
+                {id: "AnalyticsModule"},
+                {id: "LogAggregator"},
+                {id: "PaymentGatewayIntegration"},
+                {id: "ThirdPartyPaymentAPI"},
+                {id: "DeploymentScript"}
+            ],
+            links: [
+                {source: "WebApp_Main", target: "UserService", type: "uses", desc: "The main web application depends on the user service for authentication and user management."},
+                {source: "WebApp_Main", target: "ProductService", type: "uses", desc: "The main web application depends on the product service for retrieving and managing product data."},
+                {source: "UserService", target: "DatabaseModule", type: "reads/writes", desc: "The user service depends on the database module to store and retrieve user information."},
+                {source: "ProductService", target: "DatabaseModule", type: "reads/writes", desc: "The product service depends on the database module to store and retrieve product data."},
+                {source: "ProductService", target: "InventoryService", type: "checks_availability", desc: "The product service depends on the inventory service to check product availability."},
+                {source: "ProductService", target: "RecommendationEngine", type: "provides_data_to", desc: "The product service provides data to the recommendation engine for personalized suggestions."},
+                {source: "InventoryService", target: "DatabaseModule", type: "reads", desc: "The inventory service depends on the database module to access inventory data."},
+                {source: "AnalyticsModule", target: "DatabaseModule", type: "reads", desc: "The analytics module reads data from the database module for reporting and insights."},
+                {source: "AnalyticsModule", target: "LogAggregator", type: "reads", desc: "The analytics module depends on the log aggregator to analyze system logs."},
+                {source: "PaymentGatewayIntegration", target: "ThirdPartyPaymentAPI", type: "calls_external_api", desc: "The payment gateway integration module calls an external API for processing payments."},
+                {source: "WebApp_Main", target: "PaymentGatewayIntegration", type: "initiates_payment", desc: "The main web application initiates payments through the payment gateway integration."},
+                {source: "DeploymentScript", target: "WebApp_Main", type: "deploys", desc: "The deployment script deploys the main web application."},
+                {source: "DeploymentScript", target: "UserService", type: "deploys", desc: "The deployment script deploys the user service."},
+                {source: "DeploymentScript", target: "ProductService", type: "deploys", desc: "The deployment script deploys the product service."}
+            ]
+        };
+    
+        const colorByType = {
+            uses: "#6366f1",
+            "reads/writes": "#f59e0b",
+            reads: "#10b981",
+            checks_availability: "#ef4444",
+            provides_data_to: "#06b6d4",
+            calls_external_api: "#8b5cf6",
+            initiates_payment: "#f472b6",
+            deploys: "#fbbf24"
+        };
+    
+        const container = document.getElementById('demo-visualization');
+        container.innerHTML = '';
+        const width = container.clientWidth || 800;
+        const height = 400;
+    
+        const svg = d3.select(container)
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height);
+    
+        // Tooltip
+        const tooltip = d3.select(container)
+            .append('div')
+            .attr('class', 'tooltip')
+            .style('position', 'absolute')
+            .style('pointer-events', 'none')
+            .style('background', '#fff')
+            .style('color', '#222')
+            .style('padding', '8px 14px')
+            .style('border-radius', '8px')
+            .style('box-shadow', '0 2px 8px rgba(0,0,0,0.15)')
+            .style('font-size', '14px')
+            .style('opacity', 0);
+    
+        // Simulation
+        const simulation = d3.forceSimulation(data.nodes)
+            .force('link', d3.forceLink(data.links).id(d => d.id).distance(140))
+            .force('charge', d3.forceManyBody().strength(-600))
+            .force('center', d3.forceCenter(width / 2, height / 2));
+    
+        // Draw links
+        const link = svg.append('g')
+            .selectAll('path')
+            .data(data.links)
+            .enter().append('path')
+            .attr('stroke', d => colorByType[d.type] || '#aaa')
+            .attr('stroke-width', 3)
+            .attr('fill', 'none')
+            .attr('opacity', 0.85);
+    
+        // Draw nodes as rounded rectangles
+        const node = svg.append('g')
+            .selectAll('g')
+            .data(data.nodes)
+            .enter().append('g')
+            .call(d3.drag()
+                .on('start', dragstarted)
+                .on('drag', dragged)
+                .on('end', dragended)
+            );
+    
+        node.append('rect')
+            .attr('x', -60)
+            .attr('y', -22)
+            .attr('width', 120)
+            .attr('height', 44)
+            .attr('rx', 14)
+            .attr('fill', '#fff')
+            .attr('stroke', '#6366f1')
+            .attr('stroke-width', 2)
+            .attr('filter', 'url(#shadow)');
+    
+        node.append('text')
+            .attr('text-anchor', 'middle')
+            .attr('dy', 6)
+            .attr('font-size', 16)
+            .attr('font-family', 'monospace')
+            .attr('font-weight', 600)
+            .attr('fill', '#222')
+            .text(d => d.id.replace(/_/g, ' '));
+    
+        // Optional: Add drop shadow filter
+        svg.append('defs').append('filter')
+            .attr('id', 'shadow')
+            .html('<feDropShadow dx=\"0\" dy=\"2\" stdDeviation=\"2\" flood-color=\"#888\" flood-opacity=\"0.18\"/>');
+    
+        // Tooltip events
+        node.on('mouseover', (event, d) => {
+            const incoming = data.links.filter(l => l.target === d.id);
+            const outgoing = data.links.filter(l => l.source === d.id);
+            let html = `<strong>${d.id.replace(/_/g, ' ')}</strong><br/>`;
+            if (incoming.length) {
+                html += `<div style='margin-top:4px;'><em>Incoming:</em><ul style='margin:0 0 0 12px;padding:0;'>` +
+                    incoming.map(l => `<li>${l.source.replace(/_/g, ' ')} <span style='color:${colorByType[l.type]};'>(${l.type})</span></li>`).join('') +
+                    `</ul></div>`;
+            }
+            if (outgoing.length) {
+                html += `<div style='margin-top:4px;'><em>Outgoing:</em><ul style='margin:0 0 0 12px;padding:0;'>` +
+                    outgoing.map(l => `<li>${l.target.replace(/_/g, ' ')} <span style='color:${colorByType[l.type]};'>(${l.type})</span></li>`).join('') +
+                    `</ul></div>`;
+            }
+            tooltip.html(html)
+                .style('left', (event.offsetX + 20) + 'px')
+                .style('top', (event.offsetY - 10) + 'px')
+                .transition().duration(150).style('opacity', 1);
+        }).on('mouseout', () => {
+            tooltip.transition().duration(200).style('opacity', 0);
+        });
+    
+        // Animate and position
+        simulation.on('tick', () => {
+            link.attr('d', d => {
+                const dx = d.target.x - d.source.x;
+                const dy = d.target.y - d.source.y;
+                const dr = Math.sqrt(dx * dx + dy * dy) * 0.7;
+                return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
+            });
+            node.attr('transform', d => `translate(${d.x},${d.y})`);
+        });
+    
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+    }
+    
+    // To use this, call createStyledDependencyGraphDemo() when the relevant demo tab is selected.
+    
     </script>
 </body>
 </html> 
